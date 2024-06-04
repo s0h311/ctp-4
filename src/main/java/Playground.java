@@ -9,10 +9,10 @@ public class Playground {
         List<Feld> felder = new ArrayList<>();
         // ToDO: nicht hardcoded
         String inputFilePath = "src/main/resources/exercise1.csv";
-        String outputFilePath = "src/main/resources/new_data.csv";
+        String outputFilePath = "src/main/resources/Output/new_data.md";
 
         // Datei einlesen
-        felder = p1.readInputFromCSV(inputFilePath);
+        felder = p1.readInput(inputFilePath);
 
         List<Feld_MMBUE> mmbue_felder = new ArrayList<>();
         for (Feld feld : felder) {
@@ -27,29 +27,30 @@ public class Playground {
             }
         }
 
-        p1.writeOutputToCSV(outputFilePath, mmbue_felder);
+        p1.writeOutput(outputFilePath, mmbue_felder);
     }
 
-    public List<Feld> readInputFromMD(String inputFilePath) {
+    public List<Feld> readInput(String inputFilePath) {
         List<Feld> felder = new ArrayList<>();
         try (BufferedReader br = new BufferedReader(new FileReader(inputFilePath))) {
             String line;
             boolean firstLine = true;
+            boolean isMarkdown = inputFilePath.endsWith(".md");
             while ((line = br.readLine()) != null) {
                 // Skip Header
                 if (firstLine) {
                     firstLine = false;
                     continue;
                 }
-                if (line.trim().isEmpty() || line.startsWith("| ---")) {
+                if (isMarkdown && (line.trim().isEmpty() || line.startsWith("| ---"))) {
                     continue;
                 }
-                String[] values = line.split("\\|");
-                if (values.length == 5) {
-                    boolean a = values[1].trim().equals("1");
-                    boolean b = values[2].trim().equals("1");
-                    boolean c = values[3].trim().equals("1");
-                    boolean cond = values[4].trim().equals("1");
+                String[] values = isMarkdown ? line.split("\\|") : line.split(";");
+                if (values.length == (isMarkdown ? 5 : 4)) {
+                    boolean a = values[isMarkdown ? 1 : 0].trim().equals("1");
+                    boolean b = values[isMarkdown ? 2 : 1].trim().equals("1");
+                    boolean c = values[isMarkdown ? 3 : 2].trim().equals("1");
+                    boolean cond = values[isMarkdown ? 4 : 3].trim().equals("1");
                     Feld feld = new Feld(a, b, c, cond);
                     felder.add(feld);
                 } else {
@@ -64,56 +65,21 @@ public class Playground {
         return felder;
     }
 
-    public void writeOutputToMD(String outputFilePath, List<Feld_MMBUE> felder) {
-        // Neue Datei schreiben
+    public void writeOutput(String outputFilePath, List<Feld_MMBUE> felder) {
+        boolean isMarkdown = outputFilePath.endsWith(".md");
         try (BufferedWriter bw = new BufferedWriter(new FileWriter(outputFilePath))) {
-            bw.write("| A0 | A1 | A2 | B |\n");
-            bw.write("| --- | --- | --- | --- |\n");
-            for (Feld_MMBUE feld : felder) {
-                bw.write("| " + feld.toString() + " |\n");
+            if (isMarkdown) {
+                bw.write("| A0 | A1 | A2 | B | MMBUE |\n");
+                bw.write("| --- | --- | --- | --- | --- |\n");
+            } else {
+                bw.write("A0;A1;A2;B;MMBUE\n");
             }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-    public List<Feld> readInputFromCSV(String inputFilePath) {
-        List<Feld> felder = new ArrayList<>();
-        try (BufferedReader br = new BufferedReader(new FileReader(inputFilePath))) {
-            String line;
-            boolean firstLine = true;
-            while ((line = br.readLine()) != null) {
-                // Skip Header
-                if (firstLine) {
-                    firstLine = false;
-                    continue;
-                }
-                String[] values = line.split(";");
-                if (values.length == 4) {
-                    boolean a = values[0].trim().equals("1");
-                    boolean b = values[1].trim().equals("1");
-                    boolean c = values[2].trim().equals("1");
-                    boolean cond = values[3].trim().equals("1");
-                    Feld feld = new Feld(a, b, c, cond);
-                    felder.add(feld);
+            for (Feld_MMBUE feld : felder) {
+                if (isMarkdown) {
+                    bw.write("| " + feld.toString() + " |\n");
                 } else {
-                    throw new Exception("Input-File not in correct format");
+                    bw.write(feld.toCSVString() + "\n");
                 }
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-        return felder;
-    }
-
-    public void writeOutputToCSV(String outputFilePath, List<Feld_MMBUE> felder) {
-        // Neue Datei schreiben
-        try (BufferedWriter bw = new BufferedWriter(new FileWriter(outputFilePath))) {
-            bw.write("A0;A1;A2;B\n");
-            for (Feld_MMBUE feld : felder) {
-                bw.write(feld.toCSVString() + "\n");
             }
         } catch (IOException e) {
             e.printStackTrace();
