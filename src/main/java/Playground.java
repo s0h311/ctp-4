@@ -8,8 +8,8 @@ public class Playground {
         Playground p1 = new Playground();
         List<Feld> felder = new ArrayList<>();
         // ToDO: nicht hardcoded
-        String inputFilePath = "src/main/resources/exercise1.csv";
-        String outputFilePath = "src/main/resources/Output/new_data.md";
+        String inputFilePath = "src/main/resources/aufgaben1.csv";
+        String outputFilePath = "src/main/resources/Output/new_data.csv";
 
         // Datei einlesen
         felder = p1.readInput(inputFilePath);
@@ -18,16 +18,38 @@ public class Playground {
         for (Feld feld : felder) {
             mmbue_felder.add(new Feld_MMBUE(feld.isA(), feld.isB(), feld.isC(), feld.isCond()));
         }
-        for (Feld_MMBUE feld : mmbue_felder) {
-            // TODO : Füge hier die Logik für die neue Spalte hinzu
-            if (feld.isA()) {
-                feld.setMMBUE("X");
-            } else {
-                feld.setMMBUE("-");
+
+        p1.doMMBUE(mmbue_felder);
+
+        p1.writeOutput(inputFilePath, outputFilePath, mmbue_felder);
+    }
+
+    public void doMMBUE(List<Feld_MMBUE> felder) {
+        for (Feld_MMBUE feld : felder) {
+            if (feld.getMMBUE().isEmpty()) {
+                Feld_MMBUE condToggleA = findMatchingField(felder, !feld.isA(), feld.isB(), feld.isC());
+                Feld_MMBUE condToggleB = findMatchingField(felder, feld.isA(), !feld.isB(), feld.isC());
+                Feld_MMBUE condToggleC = findMatchingField(felder, feld.isA(), feld.isB(), !feld.isC());
+
+                if (condToggleA != null && condToggleB != null && condToggleC != null &&
+                        feld.isCond() == condToggleA.isCond() &&
+                        feld.isCond() == condToggleB.isCond() &&
+                        feld.isCond() == condToggleC.isCond()) {
+                    feld.setMMBUE("-");
+                }else{
+                    feld.setMMBUE("X");
+                }
             }
         }
+    }
 
-        p1.writeOutput(outputFilePath, mmbue_felder);
+    private Feld_MMBUE findMatchingField(List<Feld_MMBUE> felder, boolean a, boolean b, boolean c) {
+        for (Feld_MMBUE feld : felder) {
+            if (feld.isA() == a && feld.isB() == b && feld.isC() == c) {
+                return feld;
+            }
+        }
+        return null;
     }
 
     public List<Feld> readInput(String inputFilePath) {
@@ -65,8 +87,8 @@ public class Playground {
         return felder;
     }
 
-    public void writeOutput(String outputFilePath, List<Feld_MMBUE> felder) {
-        boolean isMarkdown = outputFilePath.endsWith(".md");
+    public void writeOutput(String inputFilePath,String outputFilePath, List<Feld_MMBUE> felder) {
+        boolean isMarkdown = inputFilePath.endsWith(".md");
         try (BufferedWriter bw = new BufferedWriter(new FileWriter(outputFilePath))) {
             if (isMarkdown) {
                 bw.write("| A0 | A1 | A2 | B | MMBUE |\n");

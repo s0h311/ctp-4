@@ -3,6 +3,11 @@ public class Feld_MMBUE extends Feld {
 
     public Feld_MMBUE(boolean a, boolean b, boolean c, boolean cond) {
         super(a, b, c, cond);
+        mmbue = "";
+    }
+
+    public String getMMBUE(){
+        return mmbue;
     }
 
     public void setMMBUE(String mmbue) {
