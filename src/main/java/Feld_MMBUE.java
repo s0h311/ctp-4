@@ -3,15 +3,17 @@ public class Feld_MMBUE extends Feld {
 
     public Feld_MMBUE(boolean a, boolean b, boolean c, boolean cond) {
         super(a, b, c, cond);
-        mmbue = "";
+        this.mmbue = "";
     }
 
-    public String getMMBUE(){
-        return mmbue;
+    @Override
+    public String toMDHeaders() {
+        return super.toMDHeaders()+ " | MMBUE |";
     }
 
-    public void setMMBUE(String mmbue) {
-        this.mmbue = mmbue;
+    @Override
+    public String toCSVHeaders() {
+        return super.toCSVHeaders() + ";MMBUE";
     }
 
     @Override
@@ -19,7 +21,16 @@ public class Feld_MMBUE extends Feld {
         return super.toString() + " | " + mmbue;
     }
 
+    @Override
     public String toCSVString() {
-        return (isA() ? "1" : "0") + ";" + (isB() ? "1" : "0") + ";" + (isC() ? "1" : "0") + ";" + (isCond() ? "1" : "0") + ";" + mmbue;
+        return super.toCSVString() + ";" + mmbue;
+    }
+
+    public String getMMBUE() {
+        return mmbue;
+    }
+
+    public void setMMBUE(String mmbue) {
+        this.mmbue = mmbue;
     }
 }

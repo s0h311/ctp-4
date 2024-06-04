@@ -6,44 +6,58 @@ public class Feld_MCDC extends Feld {
 
     public Feld_MCDC(boolean a, boolean b, boolean c, boolean cond) {
         super(a, b, c, cond);
-        signA = "";
-        signB = "";
-        signC = "";
-        MCDC = "";
+        this.signA = "";
+        this.signB = "";
+        this.signC = "";
+        this.MCDC = "";
+    }
 
+    @Override
+    public String toMDHeaders() {
+        return super.toMDHeaders()+ " | SA | SB | SC | MCDC |";
+    }
+
+    @Override
+    public String toCSVHeaders(){
+        return super.toCSVHeaders() + ";SIGNA;SIGNB;SIGNC;MCDC";
     }
 
     @Override
     public String toString() {
-        return super.isA() + " | " + super.isB() + " | " + super.isB() + " | " + super.isCond() + " | " + signA + " | " + signB + " | " + signC + " | " + MCDC;
+        return super.toString()+ " | " + signA + " | " + signB + " | " + signC + " | " + MCDC;
+    }
+
+    @Override
+    public String toCSVString() {
+        return super.toCSVString() + ";" + signA + ";" + signB + ";" + signC + ";" + MCDC;
     }
 
     public String getSignA() {
         return signA;
     }
 
-    public String getSignB() {
-        return signB;
-    }
-
-    public String getSignC() {
-        return signC;
-    }
-
-    public String getMCDC() {
-        return MCDC;
-    }
-
     public void setSignA(String signA) {
         this.signA = signA;
+    }
+
+    public String getSignB() {
+        return signB;
     }
 
     public void setSignB(String signB) {
         this.signB = signB;
     }
 
+    public String getSignC() {
+        return signC;
+    }
+
     public void setSignC(String signC) {
         this.signC = signC;
+    }
+
+    public String getMCDC() {
+        return MCDC;
     }
 
     public void setMCDC(String MCDC) {

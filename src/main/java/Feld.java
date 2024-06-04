@@ -27,8 +27,20 @@ public class Feld {
         return cond;
     }
 
+    public String toMDHeaders(){
+        return "| A0 | A1 | A2 | B";
+    }
+
+    public String toCSVHeaders(){
+        return "A0;A1;A2;B";
+    }
+
     @Override
     public String toString() {
         return (a ? "1" : "0") + " | " + (b ? "1" : "0") + " | " + (c ? "1" : "0") + " | " + (cond ? "1" : "0");
+    }
+
+    public String toCSVString() {
+        return (isA() ? "1" : "0") + ";" + (isB() ? "1" : "0") + ";" + (isC() ? "1" : "0") + ";" + (isCond() ? "1" : "0");
     }
 }
