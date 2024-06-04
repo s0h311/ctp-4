@@ -1,4 +1,5 @@
 import java.io.*;
+import java.text.Format;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -8,22 +9,27 @@ import java.util.stream.Collectors;
 public class Playground {
 
     public static void main(String[] args) {
-        // TODO: Possibilty to address inputFilePath,baseOutputFilePath and useMMBUE/useMCDC via Terminal???
+        if (args.length < 5) {
+            System.err.println("Usage: java Playground <inputFilePath> <baseOutputFilePath> <format> <useMMBUE> <useMCDC>");
+            System.exit(1);
+        }
+
+        String inputFilePath = args[0];
+        String baseOutputFilePath = args[1];
+        String format = args[2];
+        boolean useMMBUE = Boolean.parseBoolean(args[3]);
+        boolean useMCDC = Boolean.parseBoolean(args[4]);
+
+        orchestrator(inputFilePath, baseOutputFilePath, format, useMMBUE, useMCDC);
+    }
+
+    public static void orchestrator(String inputFilePath, String baseOutputFilePath, String formatInput, boolean useMMBUE, boolean useMCDC) {
+        List<Feld> felder;
+        String format = formatInput.equals("csv") ? ".csv" : ".md";
+
         Playground p1 = new Playground();
-        List<Feld> felder = new ArrayList<>();
-        String format = ".md";
-        //String format = ".csv";
-
-        // Configurable file paths and methods
-        String inputFilePath = "src/main/resources/exercise1.md";
-        String baseOutputFilePath = "src/main/resources/Output/aufgaben1";
-        boolean useMMBUE = true;
-        boolean useMCDC = true;
-
-        // Datei einlesen
         felder = p1.readInput(inputFilePath);
 
-        // Process fields based on chosen methods
         if (useMMBUE) {
             List<Feld_MMBUE> mmbueFelder = new ArrayList<>();
             for (Feld feld : felder) {
@@ -31,7 +37,7 @@ public class Playground {
             }
             p1.doMMBUE(mmbueFelder);
             String outputFilePath = baseOutputFilePath + "_MMBUE" + format;
-            p1.writeOutput(inputFilePath, outputFilePath, mmbueFelder);
+            p1.writeOutput(format, outputFilePath, mmbueFelder);
         }
 
         if (useMCDC) {
@@ -41,7 +47,7 @@ public class Playground {
             }
             p1.doMCDC(mcdcFelder);
             String outputFilePath = baseOutputFilePath + "_MCDC" + format;
-            p1.writeOutput(inputFilePath, outputFilePath, mcdcFelder);
+            p1.writeOutput(format, outputFilePath, mcdcFelder);
         }
     }
 
@@ -80,10 +86,9 @@ public class Playground {
         return felder;
     }
 
-    //TODO: Decide if isMarkdown depends on inputFilePath or outputFilePath
     public void writeOutput(String inputFilePath, String outputFilePath, List<? extends Feld> felder) {
         if (felder.size() > 0) {
-            boolean isMarkdown = inputFilePath.endsWith(".md");
+            boolean isMarkdown = inputFilePath.equals(".md");
             try (BufferedWriter bw = new BufferedWriter(new FileWriter(outputFilePath))) {
                 if (isMarkdown) {
                     String mdHeaders = felder.get(0).toMDHeaders();

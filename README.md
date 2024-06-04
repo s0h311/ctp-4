@@ -1,14 +1,29 @@
 # Certified Tester Praktikum 4
 
 ## Usage
+
 To use this code, follow these steps:
 
-1. Ensure you have Java installed on your system.
-2. Clone or download this repository to your local machine.
-3. Open the `Playground.java` file.
-4. Modify the input and output file paths in the `main` method according to your requirements. Both the input and output files must have the same format.
-5. Run the `main` method in `Playground.java`.
+1. **Compile the Java Classes**:
+   Open a terminal and navigate to the root directory of your project. Use the `javac` command to compile all Java files in the `src/main/java/` directory:
 
-## Important Notes
-- The input and output file paths must be updated in the `Playground.java` file before running the code.
-- Both the input and output files must have the same format for proper execution.
+```bash
+javac -d out src/main/java/*.java
+```
+
+2. **Run the Main Class**:
+Use the java command to run your Playground class and pass the necessary arguments, f.ex: 
+
+```bash
+java -cp out Playground src/main/resources/aufgaben1.csv src/main/resources/Output/aufgaben1 csv true true
+```
+Here’s a breakdown of the command-line arguments:
+- `src/main/resources/aufgaben1.csv`: Path to the input **CSV** or **Markdown** file. Feel free to specify a different directory if needed.
+- `src/main/resources/Output/aufgaben1`: Base path for the output files. You can specify any other directory as well.
+- `csv` or `md`: Output file format (**CSV** or **Markdown**).
+- `true`: Boolean flag indicating the use of **MMBUE** (Minimal Determining Multiple Condition Cover/ Minimal bestimmende Mehrfachbedingungsüberdeckung).
+- `true`: Boolean flag indicating the use of **MCDC** (Modified Condition / Decision Coverage).
+
+
+3. Output Files:
+The output files will be exported to the specified directory. There you can see the results.
