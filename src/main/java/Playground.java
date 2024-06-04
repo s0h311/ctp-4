@@ -10,17 +10,48 @@ public class Playground {
 
     public static void main(String[] args) {
         if (args.length < 5) {
-            System.err.println("Usage: java Playground <inputFilePath> <baseOutputFilePath> <format> <useMMBUE> <useMCDC>");
+            System.err.println("Usage: java Playground <inputPath> <baseOutputPath> <format> <useMMBUE> <useMCDC>");
             System.exit(1);
         }
 
-        String inputFilePath = args[0];
-        String baseOutputFilePath = args[1];
+        String inputPath = args[0];
+        String baseOutputPath = args[1];
         String format = args[2];
         boolean useMMBUE = Boolean.parseBoolean(args[3]);
         boolean useMCDC = Boolean.parseBoolean(args[4]);
 
-        orchestrator(inputFilePath, baseOutputFilePath, format, useMMBUE, useMCDC);
+        File inputDirectory = new File(inputPath);
+        if (inputDirectory.isDirectory()) {
+            processDirectory(inputPath, baseOutputPath, format, useMMBUE, useMCDC);
+        } else {
+            orchestrator(inputPath, baseOutputPath, format, useMMBUE, useMCDC);
+        }
+    }
+
+    public static void processDirectory(String inputDirectoryPath, String baseOutputPath, String format, boolean useMMBUE, boolean useMCDC) {
+        File inputDirectory = new File(inputDirectoryPath);
+        File[] files = inputDirectory.listFiles();
+        if (files == null) {
+            System.err.println("Error: Failed to list files in the input directory.");
+            return;
+        }
+
+        for (File file : files) {
+            if (file.isFile()) {
+                String fileName = file.getName();
+                String extension = fileName.substring(fileName.lastIndexOf('.'));
+
+                if (extension.equals(".csv") || extension.equals(".md")) {
+                    String fileNameWithoutExtension = fileName.substring(0, fileName.lastIndexOf('.'));
+                    orchestrator(file.getPath(), baseOutputPath + fileNameWithoutExtension, format, useMMBUE, useMCDC);
+                } else {
+                    System.out.println("Unsupported file format: " + fileName);
+                }
+            } else {
+                //TODO: Diskutiere, ob verschachteltes Verzeichnis
+                System.out.println("Skipping directory: " + file.getName());
+            }
+        }
     }
 
     public static void orchestrator(String inputFilePath, String baseOutputFilePath, String formatInput, boolean useMMBUE, boolean useMCDC) {
