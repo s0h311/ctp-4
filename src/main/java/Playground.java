@@ -8,56 +8,61 @@ import java.util.List;
 
 public class Playground {
 
-  public static void main(String[] args) {
-    List<Feld> felder = new ArrayList<>();
-    String inputFilePath = "src/main/resources/exercise1.md";
-    String outputFilePath = "src/main/resources/new_data.md";
+    public static void main(String[] args) {
+        Playground p1 = new Playground();
+        List<Feld> felder = new ArrayList<>();
+        // ToDO: nicht hardcoded
+        String inputFilePath = "src/main/resources/exercise1.md";
+        String outputFilePath = "src/main/resources/new_data.md";
 
-    // Datei einlesen
-    try (BufferedReader br = new BufferedReader(new FileReader(inputFilePath))) {
-      String line;
-      boolean firstLine = true;
-      while ((line = br.readLine()) != null) {
-        // Skip Header
-        if (firstLine) {
-          firstLine = false;
-          continue;
+        // Datei einlesen
+        try (BufferedReader br = new BufferedReader(new FileReader(inputFilePath))) {
+            String line;
+            boolean firstLine = true;
+            while ((line = br.readLine()) != null) {
+                // Skip Header
+                if (firstLine) {
+                    firstLine = false;
+                    continue;
+                }
+                if (line.trim().isEmpty() || line.startsWith("| ---")) {
+                    continue;
+                }
+                String[] values = line.split("\\|");
+                if (values.length == 5) {
+                    boolean a = values[1].trim().equals("1");
+                    boolean b = values[2].trim().equals("1");
+                    boolean c = values[3].trim().equals("1");
+                    boolean cond = values[4].trim().equals("1");
+                    Feld feld = new Feld(a, b, c, cond);
+                    felder.add(feld);
+                } else {
+                    throw new Exception("Input-File not in correct format");
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
         }
-        if (line.trim().isEmpty() || line.startsWith("| ---")) {
-          continue;
+
+        for (Feld feld : felder) {
+            // TODO : Füge hier die Logik für die neue Spalte hinzu
         }
-        String[] values = line.split("\\|");
-        if (values.length == 5) {
-          boolean a0 = values[1].trim().equals("1");
-          boolean a1 = values[2].trim().equals("1");
-          boolean a2 = values[3].trim().equals("1");
-          boolean b = values[4].trim().equals("1");
-          Feld feld = new Feld(a0, a1, a2, b);
-          felder.add(feld);
-        }else {
-          throw new Exception("Input-File not in correct format");
-        }
-      }
-    } catch (IOException e) {
-      e.printStackTrace();
-    } catch (Exception e) {
-      throw new RuntimeException(e);
+
+        p1.writeOutput(outputFilePath, felder);
     }
 
-    for (Feld feld : felder) {
-      // TODO : Füge hier die Logik für die neue Spalte hinzu
-      feld.setMCDC("A1");
+    public void writeOutput(String outputFilePath, List<Feld> felder) {
+        // Neue Datei schreiben
+        try (BufferedWriter bw = new BufferedWriter(new FileWriter(outputFilePath))) {
+            bw.write("| A0 | A1 | A2 | B |\n");
+            bw.write("| --- | --- | --- | --- |\n");
+            for (Feld feld : felder) {
+                bw.write("| " + feld.toString() + " |\n");
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
-
-    // Neue Datei schreiben
-    try (BufferedWriter bw = new BufferedWriter(new FileWriter(outputFilePath))) {
-      bw.write("| A0 | A1 | A2 | B |\n");
-      bw.write("| --- | --- | --- | --- |\n");
-      for (Feld feld : felder) {
-        bw.write("| " + feld.toStringMCDC() + " |\n");
-      }
-    } catch (IOException e) {
-      e.printStackTrace();
-    }
-  }
 }
