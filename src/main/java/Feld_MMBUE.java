@@ -8,7 +8,7 @@ public class Feld_MMBUE extends Feld {
 
     @Override
     public String toMDHeaders() {
-        return super.toMDHeaders()+ " | MMBUE |";
+        return super.toMDHeaders()+ " MMBUE |";
     }
 
     @Override
@@ -18,7 +18,7 @@ public class Feld_MMBUE extends Feld {
 
     @Override
     public String toString() {
-        return super.toString() + " | " + mmbue;
+        return super.toString() + mmbue +" |";
     }
 
     @Override

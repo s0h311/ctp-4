@@ -11,11 +11,11 @@ public class Playground {
         // TODO: Possibilty to address inputFilePath,baseOutputFilePath and useMMBUE/useMCDC via Terminal???
         Playground p1 = new Playground();
         List<Feld> felder = new ArrayList<>();
-        //String format = ".md";
-        String format = ".csv";
+        String format = ".md";
+        //String format = ".csv";
 
         // Configurable file paths and methods
-        String inputFilePath = "src/main/resources/aufgaben1.csv";
+        String inputFilePath = "src/main/resources/exercise1.md";
         String baseOutputFilePath = "src/main/resources/Output/aufgaben1";
         boolean useMMBUE = true;
         boolean useMCDC = true;
@@ -85,24 +85,19 @@ public class Playground {
         if (felder.size() > 0) {
             boolean isMarkdown = inputFilePath.endsWith(".md");
             try (BufferedWriter bw = new BufferedWriter(new FileWriter(outputFilePath))) {
-                //TODO: better readability
                 if (isMarkdown) {
-                    bw.write(felder.get(0).toMDHeaders() + "\n");
-                    long count = felder.get(0).toMDHeaders().chars().filter(ch -> ch == '|').count() - 1;
-                    String newLine = "";
-                    for (int i = 0; i < count; i++) {
-                        newLine += "| --- ";
-                        if (i == count - 1) {
-                            newLine += "|\n";
-                        }
-                    }
-                    bw.write(newLine);
+                    String mdHeaders = felder.get(0).toMDHeaders();
+                    bw.write(mdHeaders + "\n");
+
+                    int count = (int) mdHeaders.chars().filter(ch -> ch == '|').count() - 1;
+                    String separatorLine = "| --- ".repeat(Math.max(0, count)) + "|\n";
+                    bw.write(separatorLine);
                 } else {
                     bw.write(felder.get(0).toCSVHeaders() + "\n");
                 }
                 for (Feld feld : felder) {
                     if (isMarkdown) {
-                        bw.write("| " + feld.toString() + " |\n");
+                        bw.write(feld.toString() + "\n");
                     } else {
                         bw.write(feld.toCSVString() + "\n");
                     }
@@ -113,68 +108,6 @@ public class Playground {
         }
     }
 
-
-    public void doMCDC(List<Feld_MCDC> felder) {
-        //TODO: better readability
-        int a = 1;
-        int b = 1;
-        int c = 1;
-
-        // Sign A, Sign B, Sign C
-        for (Feld_MCDC feld : felder) {
-            if (feld.getSignA().isEmpty()) {
-                Feld_MCDC condToggleA = findMatchingField(felder, !feld.isA(), feld.isB(), feld.isC());
-                if (feld.isCond() != condToggleA.isCond()) {
-                    feld.setSignA("A" + a);
-                    condToggleA.setSignA("A" + a);
-                    a++;
-                } else {
-                    feld.setSignA("-");
-                    condToggleA.setSignA("-");
-                }
-            }
-
-            if (feld.getSignB().isEmpty()) {
-                Feld_MCDC condToggleB = findMatchingField(felder, feld.isA(), !feld.isB(), feld.isC());
-                if (feld.isCond() != condToggleB.isCond()) {
-                    feld.setSignB("B" + b);
-                    condToggleB.setSignB("B" + b);
-                    b++;
-                } else {
-                    feld.setSignB("-");
-                    condToggleB.setSignB("-");
-                }
-            }
-
-            if (feld.getSignC().isEmpty()) {
-                Feld_MCDC condToggleC = findMatchingField(felder, feld.isA(), feld.isB(), !feld.isC());
-                if (feld.isCond() != condToggleC.isCond()) {
-                    feld.setSignC("C" + c);
-                    condToggleC.setSignC("C" + c);
-                    c++;
-                } else {
-                    feld.setSignC("-");
-                    condToggleC.setSignC("-");
-                }
-            }
-        }
-
-        // MCDC
-        Optional<Feld_MCDC> mostSign = felder.stream()
-                .max(Comparator.comparingInt(feld -> {
-                    int count = 0;
-                    count += feld.getSignA().equals("-") ? 0 : 1;
-                    count += feld.getSignB().equals("-") ? 0 : 1;
-                    count += feld.getSignC().equals("-") ? 0 : 1;
-                    return count;
-                }));
-        mostSign.get().setMCDC("X");
-        findMatchingField(felder, mostSign.get(), mostSign.get().getSignA()).setMCDC("X");
-        findMatchingField(felder, mostSign.get(), mostSign.get().getSignB()).setMCDC("X");
-        findMatchingField(felder, mostSign.get(), mostSign.get().getSignC()).setMCDC("X");
-
-    }
-
     public void doMMBUE(List<Feld_MMBUE> felder) {
         for (Feld_MMBUE feld : felder) {
             if (feld.getMMBUE().isEmpty()) {
@@ -182,16 +115,54 @@ public class Playground {
                 Feld_MMBUE condToggleB = findMatchingField(felder, feld.isA(), !feld.isB(), feld.isC());
                 Feld_MMBUE condToggleC = findMatchingField(felder, feld.isA(), feld.isB(), !feld.isC());
 
-                if (condToggleA != null && condToggleB != null && condToggleC != null &&
-                        feld.isCond() == condToggleA.isCond() &&
-                        feld.isCond() == condToggleB.isCond() &&
-                        feld.isCond() == condToggleC.isCond()) {
+                if (condToggleA != null && condToggleB != null && condToggleC != null && feld.isCond() == condToggleA.isCond() && feld.isCond() == condToggleB.isCond() && feld.isCond() == condToggleC.isCond()) {
                     feld.setMMBUE("-");
                 } else {
                     feld.setMMBUE("X");
                 }
             }
         }
+    }
+
+    public void doMCDC(List<Feld_MCDC> felder) {
+        int[] counters = new int[]{1, 1, 1};
+
+        // Sign A, Sign B, Sign C
+        for (Feld_MCDC feld : felder) {
+            counters[0] = updateSignIfNeeded(felder, feld, 'A', counters[0]);
+            counters[1] = updateSignIfNeeded(felder, feld, 'B', counters[1]);
+            counters[2] = updateSignIfNeeded(felder, feld, 'C', counters[2]);
+        }
+
+        // MCDC
+        Optional<Feld_MCDC> mostSign = felder.stream().max(Comparator.comparingInt(feld -> {
+            int count = 0;
+            count += feld.getSignA().equals("-") ? 0 : 1;
+            count += feld.getSignB().equals("-") ? 0 : 1;
+            count += feld.getSignC().equals("-") ? 0 : 1;
+            return count;
+        }));
+        mostSign.get().setMCDC("X");
+        findMatchingField(felder, mostSign.get(), mostSign.get().getSignA()).setMCDC("X");
+        findMatchingField(felder, mostSign.get(), mostSign.get().getSignB()).setMCDC("X");
+        findMatchingField(felder, mostSign.get(), mostSign.get().getSignC()).setMCDC("X");
+        felder.stream().filter(feld -> feld.getMCDC().isEmpty()).forEach(feld -> feld.setMCDC("-"));
+    }
+
+    private int updateSignIfNeeded(List<Feld_MCDC> felder, Feld_MCDC feld, char sign, int counter) {
+        String signValue = feld.getSign(sign);
+        if (signValue.isEmpty()) {
+            Feld_MCDC condToggle = findMatchingField(felder, sign == 'A' ? !feld.isA() : feld.isA(), sign == 'B' ? !feld.isB() : feld.isB(), sign == 'C' ? !feld.isC() : feld.isC());
+            if (feld.isCond() != condToggle.isCond()) {
+                feld.setSign(sign, String.valueOf(sign) + counter);
+                condToggle.setSign(sign, String.valueOf(sign) + counter);
+                counter++;
+            } else {
+                feld.setSign(sign, "-");
+                condToggle.setSign(sign, "-");
+            }
+        }
+        return counter;
     }
 
     private <T extends Feld> T findMatchingField(List<T> felder, boolean a, boolean b, boolean c) {

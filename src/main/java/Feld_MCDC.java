@@ -14,22 +14,51 @@ public class Feld_MCDC extends Feld {
 
     @Override
     public String toMDHeaders() {
-        return super.toMDHeaders()+ " | SA | SB | SC | MCDC |";
+        return super.toMDHeaders() + " SA | SB | SC | MCDC |";
     }
 
     @Override
-    public String toCSVHeaders(){
+    public String toCSVHeaders() {
         return super.toCSVHeaders() + ";SIGNA;SIGNB;SIGNC;MCDC";
     }
 
     @Override
     public String toString() {
-        return super.toString()+ " | " + signA + " | " + signB + " | " + signC + " | " + MCDC;
+        return super.toString() + signA + " | " + signB + " | " + signC + " | " + MCDC + " |";
     }
 
     @Override
     public String toCSVString() {
         return super.toCSVString() + ";" + signA + ";" + signB + ";" + signC + ";" + MCDC;
+    }
+
+    public String getSign(char sign) {
+        switch (sign) {
+            case 'A':
+                return signA;
+            case 'B':
+                return signB;
+            case 'C':
+                return signC;
+            default:
+                return "";
+        }
+    }
+
+    public void setSign(char sign, String value) {
+        switch (sign) {
+            case 'A':
+                setSignA(value);
+                break;
+            case 'B':
+                setSignB(value);
+                break;
+            case 'C':
+                setSignC(value);
+                break;
+            default:
+                break;
+        }
     }
 
     public String getSignA() {
