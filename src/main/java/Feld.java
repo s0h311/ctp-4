@@ -11,16 +11,6 @@ public class Feld {
         this.cond = cond;
     }
 
-    @Override
-    public String toString() {
-        return a + " | " + b + " | " + c + " | " + cond;
-    }
-
-    public static String getHeader() {
-        StringBuilder header = new StringBuilder("| A0 | A1 | A2 | B |");
-        return header.toString() + "\n";
-    }
-
     public boolean isA() {
         return a;
     }
@@ -37,19 +27,8 @@ public class Feld {
         return cond;
     }
 
-    public void setA(boolean a) {
-        this.a = a;
-    }
-
-    public void setB(boolean b) {
-        this.b = b;
-    }
-
-    public void setC(boolean c) {
-        this.c = c;
-    }
-
-    public void setCond(boolean cond) {
-        this.cond = cond;
+    @Override
+    public String toString() {
+        return (a ? "1" : "0") + " | " + (b ? "1" : "0") + " | " + (c ? "1" : "0") + " | " + (cond ? "1" : "0");
     }
 }

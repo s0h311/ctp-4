@@ -1,20 +1,20 @@
-public class Feld_MMBUE extends Feld{
-    String MMBUE;
+public class Feld_MMBUE extends Feld {
+    private String mmbue;
 
     public Feld_MMBUE(boolean a, boolean b, boolean c, boolean cond) {
         super(a, b, c, cond);
     }
 
+    public void setMMBUE(String mmbue) {
+        this.mmbue = mmbue;
+    }
+
     @Override
     public String toString() {
-        return super.isA() + " | " + super.isB() + " | " + super.isB() + " | " + super.isCond() + " | " + MMBUE;
+        return super.toString() + " | " + mmbue;
     }
 
-    public String getMMBUE() {
-        return MMBUE;
-    }
-
-    public void setMMBUE(String MMBUE) {
-        this.MMBUE = MMBUE;
+    public String toCSVString() {
+        return (isA() ? "1" : "0") + ";" + (isB() ? "1" : "0") + ";" + (isC() ? "1" : "0") + ";" + (isCond() ? "1" : "0") + ";" + mmbue;
     }
 }
