@@ -2,6 +2,8 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.ValueSource;
 
 import java.io.BufferedReader;
@@ -12,6 +14,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class ConditionCoverageTest {
   public final String TEMP_DIR = "/Users/soheil.nazari/funprojects/uni/ctp-4/src/test/resources/tmp/";
@@ -26,16 +29,37 @@ public class ConditionCoverageTest {
         .forEach(File::delete);
   }
 
+  private static Stream<Arguments> exerciseProvider() {
+    return Stream.of(
+        Arguments.arguments("ex0", "md"),
+        Arguments.arguments("ex0", "csv"),
+        Arguments.arguments("ex1", "md"),
+        Arguments.arguments("ex1", "csv"),
+        Arguments.arguments("ex2", "md"),
+        Arguments.arguments("ex2", "csv"),
+        Arguments.arguments("ex3", "md"),
+        Arguments.arguments("ex3", "csv"),
+        Arguments.arguments("ex4", "md"),
+        Arguments.arguments("ex4", "csv"),
+        Arguments.arguments("ex5", "md"),
+        Arguments.arguments("ex5", "csv"),
+        Arguments.arguments("ex6", "md"),
+        Arguments.arguments("ex6", "csv"),
+        Arguments.arguments("ex7", "md"),
+        Arguments.arguments("ex7", "csv")
+    );
+  }
+
   @ParameterizedTest
-  @ValueSource(strings = {"ex0", "ex1", "ex3", "ex4", "ex5", "ex6", "ex7"})
-  public void testMmbueMarkdownOutput(String exercise) throws IOException {
-    String inputPath = EXERCISE_DIR + exercise + ".md";
+  @MethodSource("exerciseProvider")
+  public void testMmbue(String exercise, String fileFormat) throws IOException {
+    String inputPath = EXERCISE_DIR + exercise + "." + fileFormat;
     String outputPath = TEMP_DIR + exercise;
 
-    Playground.main(new String[]{inputPath, outputPath, "md", "true", "true"});
+    Playground.main(new String[]{inputPath, outputPath, fileFormat, "true", "true"});
 
-    String resultPath = TEMP_DIR + exercise + "_MMBUE.md";
-    String solutionPath = SOLUTION_DIR + exercise + "_MMBUE.md";
+    String resultPath = TEMP_DIR + exercise + "_MMBUE." + fileFormat;
+    String solutionPath = SOLUTION_DIR + exercise + "_MMBUE." + fileFormat;
 
     String resultLines = "1";
     String solutionLines = "2";
@@ -52,65 +76,15 @@ public class ConditionCoverageTest {
   }
 
   @ParameterizedTest
-  @ValueSource(strings = {"ex0", "ex1", "ex3", "ex4", "ex5", "ex6", "ex7"})
-  public void testMmbueCsvOutput(String exercise) throws IOException {
-    String inputPath = EXERCISE_DIR + exercise + ".md";
+  @MethodSource("exerciseProvider")
+  public void testMcdc(String exercise, String fileFormat) throws IOException {
+    String inputPath = EXERCISE_DIR + exercise + "." + fileFormat;
     String outputPath = TEMP_DIR + exercise;
 
-    Playground.main(new String[]{inputPath, outputPath, "csv", "true", "true"});
+    Playground.main(new String[]{inputPath, outputPath, fileFormat, "true", "true"});
 
-    String resultPath = TEMP_DIR + exercise + "_MMBUE.csv";
-    String solutionPath = SOLUTION_DIR + exercise + "_MMBUE.csv";
-
-    String resultLines = "1";
-    String solutionLines = "2";
-
-    try (BufferedReader br = new BufferedReader(new FileReader(resultPath))) {
-      resultLines = br.lines().collect(Collectors.joining());
-    }
-
-    try (BufferedReader br = new BufferedReader(new FileReader(solutionPath))) {
-      solutionLines = br.lines().collect(Collectors.joining());
-    }
-
-    Assertions.assertEquals(solutionLines, resultLines);
-  }
-
-  @ParameterizedTest
-  @ValueSource(strings = {"ex0", "ex1", "ex3", "ex4", "ex5", "ex6", "ex7"})
-  public void testMcdcMarkdownOutput(String exercise) throws IOException {
-    String inputPath = EXERCISE_DIR + exercise + ".md";
-    String outputPath = TEMP_DIR + exercise;
-
-    Playground.main(new String[]{inputPath, outputPath, "md", "true", "true"});
-
-    String resultPath = TEMP_DIR + exercise + "_MCDC.md";
-    String solutionPath = SOLUTION_DIR + exercise + "_MCDC.md";
-
-    String resultLines = "1";
-    String solutionLines = "2";
-
-    try (BufferedReader br = new BufferedReader(new FileReader(resultPath))) {
-      resultLines = br.lines().collect(Collectors.joining());
-    }
-
-    try (BufferedReader br = new BufferedReader(new FileReader(solutionPath))) {
-      solutionLines = br.lines().collect(Collectors.joining());
-    }
-
-    Assertions.assertEquals(solutionLines, resultLines);
-  }
-
-  @ParameterizedTest
-  @ValueSource(strings = {"ex0", "ex1", "ex3", "ex4", "ex5", "ex6", "ex7"})
-  public void testMcdcCsvOutput(String exercise) throws IOException {
-    String inputPath = EXERCISE_DIR + exercise + ".md";
-    String outputPath = TEMP_DIR + exercise;
-
-    Playground.main(new String[]{inputPath, outputPath, "csv", "true", "true"});
-
-    String resultPath = TEMP_DIR + exercise + "_MCDC.csv";
-    String solutionPath = SOLUTION_DIR + exercise + "_MCDC.csv";
+    String resultPath = TEMP_DIR + exercise + "_MCDC." + fileFormat;
+    String solutionPath = SOLUTION_DIR + exercise + "_MCDC." + fileFormat;
 
     String resultLines = "1";
     String solutionLines = "2";
@@ -147,5 +121,59 @@ public class ConditionCoverageTest {
 
       Assertions.assertEquals(solutionLines, resultLines);
     }
+  }
+
+  @Test
+  public void testLessThanFiveParams() {
+    Assertions.assertThrows(
+        IllegalArgumentException.class,
+        () -> Playground.main(new String[]{EXERCISE_DIR, TEMP_DIR, "csv", "true"})
+    );
+  }
+
+  @ParameterizedTest
+  @ValueSource(strings = {
+      "/Users/soheil.nazari/funprojects/uni/ctp-4/src/test/resources/malformed-files/malformed0.md",
+      "/Users/soheil.nazari/funprojects/uni/ctp-4/src/test/resources/malformed-files/malformed0.csv"
+  })
+  public void testMalformedFile(String path) {
+    Assertions.assertThrows(
+        IllegalArgumentException.class,
+        () -> Playground.main(new String[]{path, TEMP_DIR, "csv", "true", "true"})
+    );
+  }
+
+  @ParameterizedTest
+  @ValueSource(strings = {
+      "/Users/soheil.nazari/funprojects/uni/ctp-4/src/test/resources/not-existing-file.md",
+      "/Users/soheil.nazari/funprojects/uni/ctp-4/src/test/resources/not-existing-file.csv"
+  })
+  public void testNotExistingFile(String path) {
+    Assertions.assertThrows(
+        RuntimeException.class,
+        () -> Playground.main(new String[]{path, TEMP_DIR, "csv", "true", "true"})
+    );
+  }
+
+  @ParameterizedTest
+  @ValueSource(strings = {
+      "/Users/soheil.nazari/funprojects/uni/ctp-4/src/test/resources/",
+  })
+  public void testNotUnsupportedFileFormat(String path) {
+    Assertions.assertThrows(
+        IllegalArgumentException.class,
+        () -> Playground.main(new String[]{path, TEMP_DIR, "csv", "true", "true"})
+    );
+  }
+
+  @ParameterizedTest
+  @ValueSource(strings = {
+      "/Users/soheil.nazari/funprojects/uni/ctp-4/src/test/resources/unsupported.mp3/result",
+  })
+  public void testMalformedPath(String path) {
+    Assertions.assertThrows(
+        RuntimeException.class,
+        () -> Playground.main(new String[]{EXERCISE_DIR, path, "csv", "true", "true"})
+    );
   }
 }
