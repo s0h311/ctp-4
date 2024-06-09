@@ -17,9 +17,10 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class ConditionCoverageTest {
-  public final String TEMP_DIR = "/Users/soheil.nazari/funprojects/uni/ctp-4/src/test/resources/tmp/";
-  public final String EXERCISE_DIR = "/Users/soheil.nazari/funprojects/uni/ctp-4/src/main/resources/exercises/";
-  public final String SOLUTION_DIR = "/Users/soheil.nazari/funprojects/uni/ctp-4/src/main/resources/solutions/";
+  public final String ROOT_DIR = Paths.get("").toAbsolutePath().toString();
+  public final String TEMP_DIR = ROOT_DIR + "/src/test/resources/tmp/";
+  public final String EXERCISE_DIR = ROOT_DIR + "/src/main/resources/exercises/";
+  public final String SOLUTION_DIR = ROOT_DIR + "/src/main/resources/solutions/";
 
   @AfterEach
   public void cleanUp() throws IOException {
@@ -133,8 +134,8 @@ public class ConditionCoverageTest {
 
   @ParameterizedTest
   @ValueSource(strings = {
-      "/Users/soheil.nazari/funprojects/uni/ctp-4/src/test/resources/malformed-files/malformed0.md",
-      "/Users/soheil.nazari/funprojects/uni/ctp-4/src/test/resources/malformed-files/malformed0.csv"
+      "src/test/resources/malformed-files/malformed0.md",
+      "src/test/resources/malformed-files/malformed0.csv"
   })
   public void testMalformedFile(String path) {
     Assertions.assertThrows(
@@ -145,8 +146,8 @@ public class ConditionCoverageTest {
 
   @ParameterizedTest
   @ValueSource(strings = {
-      "/Users/soheil.nazari/funprojects/uni/ctp-4/src/test/resources/not-existing-file.md",
-      "/Users/soheil.nazari/funprojects/uni/ctp-4/src/test/resources/not-existing-file.csv"
+      "src/test/resources/not-existing-file.md",
+      "src/test/resources/not-existing-file.csv"
   })
   public void testNotExistingFile(String path) {
     Assertions.assertThrows(
@@ -157,7 +158,7 @@ public class ConditionCoverageTest {
 
   @ParameterizedTest
   @ValueSource(strings = {
-      "/Users/soheil.nazari/funprojects/uni/ctp-4/src/test/resources/",
+      "src/test/resources/",
   })
   public void testNotUnsupportedFileFormat(String path) {
     Assertions.assertThrows(
@@ -168,7 +169,7 @@ public class ConditionCoverageTest {
 
   @ParameterizedTest
   @ValueSource(strings = {
-      "/Users/soheil.nazari/funprojects/uni/ctp-4/src/test/resources/unsupported.mp3/result",
+      "src/test/resources/unsupported.mp3/result",
   })
   public void testMalformedPath(String path) {
     Assertions.assertThrows(
