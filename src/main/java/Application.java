@@ -4,7 +4,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 
-public class Playground {
+public class Application {
 
   public static void main(String[] args) {
     if (args.length < 5) {
@@ -50,7 +50,7 @@ public class Playground {
     List<Feld> felder;
     String format = formatInput.equals("csv") ? ".csv" : ".md";
 
-    Playground p1 = new Playground();
+    Application p1 = new Application();
     felder = p1.readInput(inputFilePath);
 
     if (useMMBUE) {
