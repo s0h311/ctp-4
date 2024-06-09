@@ -56,7 +56,7 @@ public class ConditionCoverageTest {
     String inputPath = EXERCISE_DIR + exercise + "." + fileFormat;
     String outputPath = TEMP_DIR + exercise;
 
-    Application.main(new String[]{inputPath, outputPath, fileFormat, "true", "true"});
+    Application.main(new String[]{inputPath, outputPath, fileFormat, "mmbue"});
 
     String resultPath = TEMP_DIR + exercise + "_MMBUE." + fileFormat;
     String solutionPath = SOLUTION_DIR + exercise + "_MMBUE." + fileFormat;
@@ -81,7 +81,7 @@ public class ConditionCoverageTest {
     String inputPath = EXERCISE_DIR + exercise + "." + fileFormat;
     String outputPath = TEMP_DIR + exercise;
 
-    Application.main(new String[]{inputPath, outputPath, fileFormat, "true", "true"});
+    Application.main(new String[]{inputPath, outputPath, fileFormat, "mcdc"});
 
     String resultPath = TEMP_DIR + exercise + "_MCDC." + fileFormat;
     String solutionPath = SOLUTION_DIR + exercise + "_MCDC." + fileFormat;
@@ -102,7 +102,7 @@ public class ConditionCoverageTest {
 
   @Test
   public void testDirectory() throws IOException {
-    Application.main(new String[]{EXERCISE_DIR, TEMP_DIR, "csv", "true", "true"});
+    Application.main(new String[]{EXERCISE_DIR, TEMP_DIR, "csv", "both"});
 
     File inputDirectory = new File(TEMP_DIR);
     File[] files = inputDirectory.listFiles();
@@ -124,10 +124,10 @@ public class ConditionCoverageTest {
   }
 
   @Test
-  public void testLessThanFiveParams() {
+  public void testLessThanFourParams() {
     Assertions.assertThrows(
         IllegalArgumentException.class,
-        () -> Application.main(new String[]{EXERCISE_DIR, TEMP_DIR, "csv", "true"})
+        () -> Application.main(new String[]{EXERCISE_DIR, TEMP_DIR, "csv"})
     );
   }
 
@@ -139,7 +139,7 @@ public class ConditionCoverageTest {
   public void testMalformedFile(String path) {
     Assertions.assertThrows(
         IllegalArgumentException.class,
-        () -> Application.main(new String[]{path, TEMP_DIR, "csv", "true", "true"})
+        () -> Application.main(new String[]{path, TEMP_DIR, "csv", "both"})
     );
   }
 
@@ -151,7 +151,7 @@ public class ConditionCoverageTest {
   public void testNotExistingFile(String path) {
     Assertions.assertThrows(
         RuntimeException.class,
-        () -> Application.main(new String[]{path, TEMP_DIR, "csv", "true", "true"})
+        () -> Application.main(new String[]{path, TEMP_DIR, "csv", "both"})
     );
   }
 
@@ -162,7 +162,7 @@ public class ConditionCoverageTest {
   public void testNotUnsupportedFileFormat(String path) {
     Assertions.assertThrows(
         IllegalArgumentException.class,
-        () -> Application.main(new String[]{path, TEMP_DIR, "csv", "true", "true"})
+        () -> Application.main(new String[]{path, TEMP_DIR, "csv", "both"})
     );
   }
 
@@ -173,7 +173,7 @@ public class ConditionCoverageTest {
   public void testMalformedPath(String path) {
     Assertions.assertThrows(
         RuntimeException.class,
-        () -> Application.main(new String[]{EXERCISE_DIR, path, "csv", "true", "true"})
+        () -> Application.main(new String[]{EXERCISE_DIR, path, "csv", "both"})
     );
   }
 }

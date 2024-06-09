@@ -23,7 +23,7 @@ When uploading a **single file**, the output path is directly utilized.
 The resulting file **inherits** the name of the output path, supplemented with either a .csv or .md extension.
 
 ```bash
-java -cp out Application src/main/resources/aufgaben1.csv src/main/resources/Output/aufgaben1 csv true true
+java -cp out Application src/main/resources/aufgaben1.csv src/main/resources/Output/aufgaben1 csv both
 ```
 
 ### 2.2. **Example with Directory Input**:
@@ -33,7 +33,7 @@ The generated filenames are **based on the input names**, so please ensure that 
 (Note: The directory path must end with `"/"`).
 
 ```bash
-java -cp out Application src/main/resources/exercises src/main/resources/Output/ csv true true
+java -cp out Application src/main/resources/exercises src/main/resources/Output/ csv both
 ```
 
 Here’s a breakdown of the command-line arguments:
@@ -42,9 +42,10 @@ Here’s a breakdown of the command-line arguments:
   directory if needed.
 - `src/main/resources/Output/aufgaben1`: Base path for the output files. You can specify any other directory as well.
 - `csv` or `md`: Output file format (**CSV** or **Markdown**).
-- `true`: Boolean flag indicating the use of **MMBUE** (Minimal Determining Multiple Condition Cover/ Minimal
-  bestimmende Mehrfachbedingungsüberdeckung).
-- `true`: Boolean flag indicating the use of **MCDC** (Modified Condition / Decision Coverage).
+- **method**: A string indicating which coverage criteria to use:
+    - `both`: Use both **MMBUE** (Minimal Determining Multiple Condition Cover / Minimal bestimmende Mehrfachbedingungsüberdeckung) and **MCDC** (Modified Condition / Decision Coverage).
+    - `mcdc`: Use only **MCDC**.
+    - `mmbue`: Use only **MMBUE**.
 
 
 3. Output Files:
