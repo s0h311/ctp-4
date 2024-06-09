@@ -15,7 +15,7 @@ javac -d out src/main/java/*.java
 
 ## 2. **Run the Main Class**:
 
-Use the java command to run your Playground class and pass the necessary arguments.
+Use the java command to run your Application class and pass the necessary arguments.
 
 ### 2.1. **Example with Single File Input**:
 
@@ -23,7 +23,7 @@ When uploading a **single file**, the output path is directly utilized.
 The resulting file **inherits** the name of the output path, supplemented with either a .csv or .md extension.
 
 ```bash
-java -cp out Playground src/main/resources/aufgaben1.csv src/main/resources/Output/aufgaben1 csv true true
+java -cp out Application src/main/resources/aufgaben1.csv src/main/resources/Output/aufgaben1 csv true true
 ```
 
 ### 2.2. **Example with Directory Input**:
@@ -33,7 +33,7 @@ The generated filenames are **based on the input names**, so please ensure that 
 (Note: The directory path must end with `"/"`).
 
 ```bash
-java -cp out Playground src/main/resources/exercises src/main/resources/Output/ csv true true
+java -cp out Application src/main/resources/exercises src/main/resources/Output/ csv true true
 ```
 
 Here’s a breakdown of the command-line arguments:
@@ -48,4 +48,4 @@ Here’s a breakdown of the command-line arguments:
 
 
 3. Output Files:
-The output files will be exported to the specified directory. There you can see the results.
+   The output files will be exported to the specified directory. There you can see the results.
