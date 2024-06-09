@@ -7,15 +7,16 @@ import java.util.Optional;
 public class Application {
 
   public static void main(String[] args) {
-    if (args.length < 5) {
-      throw new IllegalArgumentException("Usage: java Playground <inputPath> <baseOutputPath> <format> <useMMBUE> <useMCDC>");
+    if (args.length < 4) {
+      throw new IllegalArgumentException("Usage: java Playground <inputPath> <baseOutputPath> <format> <method:mmbue,mcdc or both>");
     }
 
     String inputPath = args[0];
     String baseOutputPath = args[1];
     String format = args[2];
-    boolean useMMBUE = Boolean.parseBoolean(args[3]);
-    boolean useMCDC = Boolean.parseBoolean(args[4]);
+    String method = args[3].toLowerCase();
+    boolean useMMBUE = method.equals("both") || method.equals("mmbue");
+    boolean useMCDC = method.equals("both") || method.equals("mcdc");
 
     File inputDirectory = new File(inputPath);
     if (inputDirectory.isDirectory()) {
