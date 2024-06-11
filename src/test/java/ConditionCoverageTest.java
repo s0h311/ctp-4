@@ -38,8 +38,6 @@ public class ConditionCoverageTest {
         Arguments.arguments("ex1", "csv"),
         Arguments.arguments("ex2", "md"),
         Arguments.arguments("ex2", "csv"),
-        Arguments.arguments("ex3", "md"),
-        Arguments.arguments("ex3", "csv"),
         Arguments.arguments("ex4", "md"),
         Arguments.arguments("ex4", "csv"),
         Arguments.arguments("ex5", "md"),
@@ -129,6 +127,18 @@ public class ConditionCoverageTest {
     Assertions.assertThrows(
         IllegalArgumentException.class,
         () -> Application.main(new String[]{EXERCISE_DIR, TEMP_DIR, "csv"})
+    );
+  }
+
+  @ParameterizedTest
+  @ValueSource(strings = {
+          "src/test/resources/malformed-files/ex3.md",
+          "src/test/resources/malformed-files/ex3.csv"
+  })
+  public void testNotCorrectInputValues(String path){
+    Assertions.assertThrows(
+            IllegalArgumentException.class,
+            () -> Application.main(new String[]{path, TEMP_DIR, "csv", "both"})
     );
   }
 

@@ -91,15 +91,21 @@ public class Application {
         }
         String[] values = isMarkdown ? line.split("\\|") : line.split(";");
         if (values.length == (isMarkdown ? 5 : 4)) {
-          boolean a = values[isMarkdown ? 1 : 0].trim().equals("1");
-          boolean b = values[isMarkdown ? 2 : 1].trim().equals("1");
-          boolean c = values[isMarkdown ? 3 : 2].trim().equals("1");
-          boolean cond = values[isMarkdown ? 4 : 3].trim().equals("1");
-          Feld feld = new Feld(a, b, c, cond);
+          String[] valuesToCheck = {values[isMarkdown ? 1 : 0], values[isMarkdown ? 2 : 1], values[isMarkdown ? 3 : 2], values[isMarkdown ? 4 : 3]};
+          boolean[] boolValues = new boolean[4];
+
+          for (int i = 0; i < 4; i++) {
+            String value = valuesToCheck[i].trim();
+            if (value.equals("0") || value.equals("1")) {
+              boolValues[i] = value.equals("1");
+            } else {
+              throw new IllegalArgumentException("Value is not '0' or '1'");
+            }
+          }
+          Feld feld = new Feld(boolValues[0], boolValues[1], boolValues[2], boolValues[3]);
           felder.add(feld);
         }
         else {
-          //TODO: improve checks if input file is correct
           throw new IllegalArgumentException("Input-File not in correct format");
         }
       }
