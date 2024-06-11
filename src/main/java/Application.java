@@ -2,7 +2,7 @@ import java.io.*;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Optional;
+import java.util.stream.Collectors;
 
 public class Application {
 
@@ -163,6 +163,16 @@ public class Application {
     }
   }
 
+  private <T extends Feld> T findMatchingField(List<T> felder, boolean a, boolean b, boolean c) {
+    for (T feld : felder) {
+      if (feld.isA() == a && feld.isB() == b && feld.isC() == c) {
+        return feld;
+      }
+    }
+
+    return null;
+  }
+
   public void doMCDC(List<Feld_MCDC> felder) {
     int[] counters = new int[]{1, 1, 1};
 
@@ -174,24 +184,42 @@ public class Application {
     }
 
     // MCDC
-    Optional<Feld_MCDC> mostSign = felder.stream().max(Comparator.comparingInt(feld -> {
-      int count = 0;
-      count += feld.getSignA().equals("-") ? 0 : 1;
-      count += feld.getSignB().equals("-") ? 0 : 1;
-      count += feld.getSignC().equals("-") ? 0 : 1;
-      return count;
-    }));
-    mostSign.get().setMCDC("X");
-    findMatchingField(felder, mostSign.get(), mostSign.get().getSignA()).setMCDC("X");
-    findMatchingField(felder, mostSign.get(), mostSign.get().getSignB()).setMCDC("X");
-    findMatchingField(felder, mostSign.get(), mostSign.get().getSignC()).setMCDC("X");
-    felder.stream().filter(feld -> feld.getMCDC().isEmpty()).forEach(feld -> feld.setMCDC("-"));
+    List<Feld_MCDC> filteredFelder = felder.stream()
+            .filter(feld -> getCount(feld) > 0)
+            .collect(Collectors.toList());
+
+    List<List<Feld_MCDC>> allCombinations = getAllCombinations(filteredFelder);
+    List<List<Feld_MCDC>> validCombinations = allCombinations.stream()
+            .filter(combination -> {
+              boolean pairA = counters[0] == 1;
+              boolean pairB = counters[1] == 1;
+              boolean pairC = counters[2] == 1;
+
+              for (Feld_MCDC feld : combination) {
+                pairA |= findMatchingSignField(combination, feld, feld.getSignA()) != null;
+                pairB |= findMatchingSignField(combination, feld, feld.getSignB()) != null;
+                pairC |= findMatchingSignField(combination, feld, feld.getSignC()) != null;
+              }
+
+              return pairA && pairB && pairC;
+            })
+            .toList();
+
+    List<Feld_MCDC> smallestCombination = validCombinations.stream()
+            .min(Comparator.comparingInt(List::size))
+            .orElse(new ArrayList<>());
+
+    felder.forEach(feld -> {
+      boolean matchFound = findMatchingField(smallestCombination, feld.isA(), feld.isB(), feld.isC()) != null;
+      feld.setMCDC(matchFound ? "X" : "-");
+    });
+
   }
 
   private int updateSignIfNeeded(List<Feld_MCDC> felder, Feld_MCDC feld, char sign, int counter) {
     String signValue = feld.getSign(sign);
     if (signValue.isEmpty()) {
-      Feld_MCDC condToggle = findMatchingField(felder, sign == 'A' ? !feld.isA() : feld.isA(), sign == 'B' ? !feld.isB() : feld.isB(), sign == 'C' ? !feld.isC() : feld.isC());
+      Feld_MCDC condToggle = findMatchingField(felder, (sign == 'A') != feld.isA(), (sign == 'B') != feld.isB(), (sign == 'C') != feld.isC());
       if (feld.isCond() != condToggle.isCond()) {
         feld.setSign(sign, String.valueOf(sign) + counter);
         condToggle.setSign(sign, String.valueOf(sign) + counter);
@@ -205,9 +233,9 @@ public class Application {
     return counter;
   }
 
-  private <T extends Feld> T findMatchingField(List<T> felder, boolean a, boolean b, boolean c) {
-    for (T feld : felder) {
-      if (feld.isA() == a && feld.isB() == b && feld.isC() == c) {
+  private Feld_MCDC findMatchingSignField(List<Feld_MCDC> felder, Feld_MCDC origin, String sign) {
+    for (Feld_MCDC feld : felder) {
+      if (!feld.equals(origin) && !sign.equals("-") && (feld.getSignA().equals(sign) || feld.getSignB().equals(sign) || feld.getSignC().equals(sign))) {
         return feld;
       }
     }
@@ -215,13 +243,31 @@ public class Application {
     return null;
   }
 
-  private Feld_MCDC findMatchingField(List<Feld_MCDC> felder, Feld_MCDC origin, String sign) {
-    for (Feld_MCDC feld : felder) {
-      if (!feld.equals(origin) && (feld.getSignA().equals(sign) || feld.getSignB().equals(sign) || feld.getSignC().equals(sign))) {
-        return feld;
-      }
+  private static int getCount(Feld_MCDC feld) {
+    int count = 0;
+    count += feld.getSignA().equals("-") ? 0 : 1;
+    count += feld.getSignB().equals("-") ? 0 : 1;
+    count += feld.getSignC().equals("-") ? 0 : 1;
+    return count;
+  }
+
+  private static List<List<Feld_MCDC>> getAllCombinations(List<Feld_MCDC> list) {
+    List<List<Feld_MCDC>> result = new ArrayList<>();
+    generateCombinations(list, 0, new ArrayList<>(), result);
+    return result;
+  }
+
+  private static void generateCombinations(List<Feld_MCDC> list, int index, List<Feld_MCDC> current, List<List<Feld_MCDC>> result) {
+    if (index == list.size()) {
+      result.add(new ArrayList<>(current));
+      return;
     }
 
-    return null;
+    generateCombinations(list, index + 1, current, result);
+
+    current.add(list.get(index));
+    generateCombinations(list, index + 1, current, result);
+
+    current.remove(current.size() - 1);
   }
 }
