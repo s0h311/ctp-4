@@ -1,5 +1,6 @@
 import java.io.*;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -57,7 +58,7 @@ public class Application {
     if (useMMBUE) {
       List<Feld_MMBUE> mmbueFelder = new ArrayList<>();
       for (Feld feld : felder) {
-        mmbueFelder.add(new Feld_MMBUE(feld.isA(), feld.isB(), feld.isC(), feld.isCond()));
+        mmbueFelder.add(new Feld_MMBUE(feld.getColumns(), feld.isCond()));
       }
       p1.doMMBUE(mmbueFelder);
       String outputFilePath = baseOutputFilePath + "_MMBUE" + format;
@@ -67,7 +68,7 @@ public class Application {
     if (useMCDC) {
       List<Feld_MCDC> mcdcFelder = new ArrayList<>();
       for (Feld feld : felder) {
-        mcdcFelder.add(new Feld_MCDC(feld.isA(), feld.isB(), feld.isC(), feld.isCond()));
+        mcdcFelder.add(new Feld_MCDC(feld.getColumns(), feld.isCond()));
       }
       p1.doMCDC(mcdcFelder);
       String outputFilePath = baseOutputFilePath + "_MCDC" + format;
@@ -90,11 +91,14 @@ public class Application {
           continue;
         }
         String[] values = isMarkdown ? line.split("\\|") : line.split(";");
-        if (values.length == (isMarkdown ? 5 : 4)) {
-          String[] valuesToCheck = {values[isMarkdown ? 1 : 0], values[isMarkdown ? 2 : 1], values[isMarkdown ? 3 : 2], values[isMarkdown ? 4 : 3]};
-          boolean[] boolValues = new boolean[4];
+        if (values.length >= (isMarkdown ? 4 : 3)) {
+          String[] valuesToCheck = new String[isMarkdown ? values.length - 1 : values.length];
+          for (int i = 0; i < valuesToCheck.length; i++) {
+            valuesToCheck[i] = values[i + (isMarkdown ? 1 : 0)];
+          }
+          boolean[] boolValues = new boolean[valuesToCheck.length];
 
-          for (int i = 0; i < 4; i++) {
+          for (int i = 0; i < boolValues.length; i++) {
             String value = valuesToCheck[i].trim();
             if (value.equals("0") || value.equals("1")) {
               boolValues[i] = value.equals("1");
@@ -102,7 +106,7 @@ public class Application {
               throw new IllegalArgumentException("Value is not '0' or '1'");
             }
           }
-          Feld feld = new Feld(boolValues[0], boolValues[1], boolValues[2], boolValues[3]);
+          Feld feld = new Feld(Arrays.copyOfRange(boolValues, 0, boolValues.length - 1), boolValues[boolValues.length - 1]);
           felder.add(feld);
         }
         else {
@@ -149,59 +153,66 @@ public class Application {
   public void doMMBUE(List<Feld_MMBUE> felder) {
     for (Feld_MMBUE feld : felder) {
       if (feld.getMMBUE().isEmpty()) {
-        Feld_MMBUE condToggleA = findMatchingField(felder, !feld.isA(), feld.isB(), feld.isC());
-        Feld_MMBUE condToggleB = findMatchingField(felder, feld.isA(), !feld.isB(), feld.isC());
-        Feld_MMBUE condToggleC = findMatchingField(felder, feld.isA(), feld.isB(), !feld.isC());
+        boolean[] originalValues = feld.getColumns();
+        boolean allMatch = true;
 
-        if (condToggleA != null && condToggleB != null && condToggleC != null && feld.isCond() == condToggleA.isCond() && feld.isCond() == condToggleB.isCond() && feld.isCond() == condToggleC.isCond()) {
-          feld.setMMBUE("-");
+        for (int i = 0; i < originalValues.length; i++) {
+          boolean[] toggledValues = Arrays.copyOf(originalValues, originalValues.length);
+          toggledValues[i] = !toggledValues[i];
+
+          Feld_MMBUE matchingField = findMatchingField(felder, toggledValues);
+          if (matchingField == null || feld.isCond() != matchingField.isCond()) {
+            allMatch = false;
+            break;
+          }
         }
-        else {
-          feld.setMMBUE("X");
-        }
+
+        feld.setMMBUE(allMatch ? "-" : "X");
       }
     }
   }
 
-  private <T extends Feld> T findMatchingField(List<T> felder, boolean a, boolean b, boolean c) {
+  private <T extends Feld> T findMatchingField(List<T> felder, boolean[] values) {
     for (T feld : felder) {
-      if (feld.isA() == a && feld.isB() == b && feld.isC() == c) {
+      if (Arrays.equals(feld.getColumns(), values)) {
         return feld;
       }
     }
-
     return null;
   }
 
   public void doMCDC(List<Feld_MCDC> felder) {
-    int[] counters = new int[]{1, 1, 1};
+    int[] counters = new int[felder.get(0).getColumns().length];
+    Arrays.fill(counters, 1);
 
-    // Sign A, Sign B, Sign C
     for (Feld_MCDC feld : felder) {
-      counters[0] = updateSignIfNeeded(felder, feld, 'A', counters[0]);
-      counters[1] = updateSignIfNeeded(felder, feld, 'B', counters[1]);
-      counters[2] = updateSignIfNeeded(felder, feld, 'C', counters[2]);
+      if (feld != null) {
+        for (int i = 0; i < counters.length; i++) {
+          counters[i] = updateSignIfNeeded(felder, feld, (char) ('A' + i), counters[i]);
+        }
+      }
     }
 
     // MCDC
     List<Feld_MCDC> filteredFelder = felder.stream()
-            .filter(feld -> getCount(feld) > 0)
+            .filter(f -> getCount(f) > 0)
             .collect(Collectors.toList());
 
     List<List<Feld_MCDC>> allCombinations = getAllCombinations(filteredFelder);
     List<List<Feld_MCDC>> validCombinations = allCombinations.stream()
             .filter(combination -> {
-              boolean pairA = counters[0] == 1;
-              boolean pairB = counters[1] == 1;
-              boolean pairC = counters[2] == 1;
+              Boolean[] pairs = Arrays.stream(counters)
+                      .mapToObj(counter -> counter == 1)
+                      .toArray(Boolean[]::new);
 
               for (Feld_MCDC feld : combination) {
-                pairA |= findMatchingSignField(combination, feld, feld.getSignA()) != null;
-                pairB |= findMatchingSignField(combination, feld, feld.getSignB()) != null;
-                pairC |= findMatchingSignField(combination, feld, feld.getSignC()) != null;
+                for (int i = 0; i < pairs.length; i++) {
+                  pairs[i] |= findMatchingSignField(combination,feld,feld.getSign(i))!=null;
+                }
               }
 
-              return pairA && pairB && pairC;
+              return Arrays.stream(pairs)
+                      .allMatch(element -> element);
             })
             .toList();
 
@@ -210,45 +221,44 @@ public class Application {
             .orElse(new ArrayList<>());
 
     felder.forEach(feld -> {
-      boolean matchFound = findMatchingField(smallestCombination, feld.isA(), feld.isB(), feld.isC()) != null;
-      feld.setMCDC(matchFound ? "X" : "-");
+        boolean matchFound = smallestCombination.stream()
+                .anyMatch(combinationFeld -> combinationFeld.equals(feld));
+        feld.setMCDC(matchFound ? "X" : "-");
     });
+  }
 
+  private Feld_MCDC findMatchingSignField(List<Feld_MCDC> felder, Feld_MCDC origin, String sign) {
+    for (Feld_MCDC feld : felder) {
+      if (!feld.equals(origin) && !sign.equals("-") && Arrays.asList(feld.getSigns()).contains(sign)) {
+        return feld;
+      }
+    }
+    return null;
   }
 
   private int updateSignIfNeeded(List<Feld_MCDC> felder, Feld_MCDC feld, char sign, int counter) {
-    String signValue = feld.getSign(sign);
-    if (signValue.isEmpty()) {
-      Feld_MCDC condToggle = findMatchingField(felder, (sign == 'A') != feld.isA(), (sign == 'B') != feld.isB(), (sign == 'C') != feld.isC());
+    int index = sign - 'A';
+    if (index>=0 && feld.getSign(index).isEmpty()) {
+      boolean[] toggledValues = Arrays.copyOf(feld.getColumns(), feld.getColumns().length);
+      toggledValues[index] = !toggledValues[index];
+      Feld_MCDC condToggle = findMatchingField(felder, toggledValues);
       if (feld.isCond() != condToggle.isCond()) {
-        feld.setSign(sign, String.valueOf(sign) + counter);
-        condToggle.setSign(sign, String.valueOf(sign) + counter);
+        feld.setSign(index, String.valueOf(sign) + counter);
+        condToggle.setSign(index, String.valueOf(sign) + counter);
         counter++;
       }
       else {
-        feld.setSign(sign, "-");
-        condToggle.setSign(sign, "-");
+        feld.setSign(index, "-");
+        condToggle.setSign(index, "-");
       }
     }
     return counter;
   }
 
-  private Feld_MCDC findMatchingSignField(List<Feld_MCDC> felder, Feld_MCDC origin, String sign) {
-    for (Feld_MCDC feld : felder) {
-      if (!feld.equals(origin) && !sign.equals("-") && (feld.getSignA().equals(sign) || feld.getSignB().equals(sign) || feld.getSignC().equals(sign))) {
-        return feld;
-      }
-    }
-
-    return null;
-  }
-
   private static int getCount(Feld_MCDC feld) {
-    int count = 0;
-    count += feld.getSignA().equals("-") ? 0 : 1;
-    count += feld.getSignB().equals("-") ? 0 : 1;
-    count += feld.getSignC().equals("-") ? 0 : 1;
-    return count;
+    return (int) Arrays.stream(feld.getSigns())
+            .filter(col -> !col.equals("-"))
+            .count();
   }
 
   private static List<List<Feld_MCDC>> getAllCombinations(List<Feld_MCDC> list) {

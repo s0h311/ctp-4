@@ -1,84 +1,71 @@
+import java.util.Arrays;
+
 public class Feld_MCDC extends Feld {
-  private String signA;
-  private String signB;
-  private String signC;
+  private String[] signs;
   private String MCDC;
 
-  public Feld_MCDC(boolean a, boolean b, boolean c, boolean cond) {
-    super(a, b, c, cond);
-    this.signA = "";
-    this.signB = "";
-    this.signC = "";
+  public Feld_MCDC(boolean[] columns, boolean cond) {
+    super(columns, cond);
+    this.signs = new String[columns.length];
+    Arrays.fill(this.signs, "");
     this.MCDC = "";
+  }
+
+  public String[] getSigns() {
+    return signs;
   }
 
   @Override
   public String toMDHeaders() {
-    return super.toMDHeaders() + " SA | SB | SC | MCDC |";
+    StringBuilder sb = new StringBuilder(super.toMDHeaders());
+    for (int i = 0; i < signs.length; i++) {
+      sb.append(" S").append((char) ('A' + i)).append(" |");
+    }
+    sb.append(" MCDC |");
+    return sb.toString();
   }
 
   @Override
   public String toCSVHeaders() {
-    return super.toCSVHeaders() + ";SIGNA;SIGNB;SIGNC;MCDC";
+    StringBuilder sb = new StringBuilder(super.toCSVHeaders());
+    for (int i = 0; i < signs.length; i++) {
+      sb.append(";SIGN").append((char) ('A' + i));
+    }
+    sb.append(";MCDC");
+    return sb.toString();
   }
 
   @Override
   public String toString() {
-    return super.toString() + signA + " | " + signB + " | " + signC + " | " + MCDC + " |";
+    StringBuilder sb = new StringBuilder(super.toString());
+    for (String sign : signs) {
+      sb.append(sign).append(" | ");
+    }
+    sb.append(MCDC).append(" |");
+    return sb.toString();
   }
 
   @Override
   public String toCSVString() {
-    return super.toCSVString() + ";" + signA + ";" + signB + ";" + signC + ";" + MCDC;
-  }
-
-  public String getSign(char sign) {
-    return switch (sign) {
-      case 'A' -> signA;
-      case 'B' -> signB;
-      case 'C' -> signC;
-      default -> "";
-    };
-  }
-
-  public void setSign(char sign, String value) {
-    switch (sign) {
-      case 'A':
-        setSignA(value);
-        break;
-      case 'B':
-        setSignB(value);
-        break;
-      case 'C':
-        setSignC(value);
-        break;
-      default:
-        break;
+    StringBuilder sb = new StringBuilder(super.toCSVString());
+    for (String sign : signs) {
+      sb.append(";").append(sign);
     }
+    sb.append(";").append(MCDC);
+    return sb.toString();
   }
 
-  public String getSignA() {
-    return signA;
+  public String getSign(int index) {
+    if (index >= 0 && index < signs.length) {
+      return signs[index];
+    }
+    return "";
   }
 
-  public void setSignA(String signA) {
-    this.signA = signA;
-  }
-
-  public String getSignB() {
-    return signB;
-  }
-
-  public void setSignB(String signB) {
-    this.signB = signB;
-  }
-
-  public String getSignC() {
-    return signC;
-  }
-
-  public void setSignC(String signC) {
-    this.signC = signC;
+  public void setSign(int index, String value) {
+    if (index >= 0 && index < signs.length) {
+      signs[index] = value;
+    }
   }
 
   public String getMCDC() {

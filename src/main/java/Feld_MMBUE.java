@@ -1,8 +1,8 @@
 public class Feld_MMBUE extends Feld {
     private String mmbue;
 
-    public Feld_MMBUE(boolean a, boolean b, boolean c, boolean cond) {
-        super(a, b, c, cond);
+    public Feld_MMBUE(boolean[] columns, boolean cond) {
+        super(columns, cond);
         this.mmbue = "";
     }
 
