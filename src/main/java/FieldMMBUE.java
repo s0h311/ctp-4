@@ -1,7 +1,7 @@
-public class Feld_MMBUE extends Feld {
+public class FieldMMBUE extends Field {
     private String mmbue;
 
-    public Feld_MMBUE(boolean a, boolean b, boolean c, boolean cond) {
+    public FieldMMBUE(boolean a, boolean b, boolean c, boolean cond) {
         super(a, b, c, cond);
         this.mmbue = "";
     }

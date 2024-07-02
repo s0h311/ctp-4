@@ -1,10 +1,10 @@
-public class Feld_MCDC extends Feld {
+public class FieldMCDC extends Field {
   private String signA;
   private String signB;
   private String signC;
   private String MCDC;
 
-  public Feld_MCDC(boolean a, boolean b, boolean c, boolean cond) {
+  public FieldMCDC(boolean a, boolean b, boolean c, boolean cond) {
     super(a, b, c, cond);
     this.signA = "";
     this.signB = "";

@@ -1,10 +1,10 @@
-public class Feld {
+public class Field {
     private boolean a;
     private boolean b;
     private boolean c;
     private boolean cond;
 
-    public Feld(boolean a, boolean b, boolean c, boolean cond) {
+    public Field(boolean a, boolean b, boolean c, boolean cond) {
         this.a = a;
         this.b = b;
         this.c = c;
